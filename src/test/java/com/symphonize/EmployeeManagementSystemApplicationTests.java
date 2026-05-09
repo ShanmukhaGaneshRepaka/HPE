@@ -1,10 +1,10 @@
-package ganesh.demo;
+package com.symphonize;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BasicFoundationApplicationTests {
+class EmployeeManagementSystemApplicationTests {
 
 	@Test
 	void contextLoads() {

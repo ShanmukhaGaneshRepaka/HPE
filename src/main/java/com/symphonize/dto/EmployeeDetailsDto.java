@@ -1,34 +1,25 @@
-package ganesh.demo.dto;
+package com.symphonize.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @XmlRootElement
 public class EmployeeDetailsDto {
-	
-	private int employeeSalary;
-	
-	private String city;
-	
-	
+
 	public EmployeeDetailsDto() {
-	}
-	public EmployeeDetailsDto(int employeeSalary, String city, String department) {
 		super();
-		this.employeeSalary = employeeSalary;
-		this.city = city;
-		this.department = department;
 	}
+
+	private int employeeSalary;
+	private String city;
+	private String department;
 
 	public int getEmployeeSalary() {
 		return employeeSalary;
-	}
-
-	@Override
-	public String toString() {
-		return "EmployeeDetailsDto [employeeSalary=" + employeeSalary + ", city=" + city + ", department=" + department
-				+ "]";
 	}
 
 	public void setEmployeeSalary(int employeeSalary) {
@@ -50,7 +41,5 @@ public class EmployeeDetailsDto {
 	public void setDepartment(String department) {
 		this.department = department;
 	}
-
-	private String department ;
 
 }
