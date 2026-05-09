@@ -1,4 +1,4 @@
-package ganesh.demo;
+package ganesh.demo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,50 +12,41 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ganesh.demo.dto.EmployeeRequestDto;
+import ganesh.demo.entity.Employee;
+import ganesh.demo.service.EmployeeService;
+
 @RestController
+@RequestMapping("/employee")
 public class EmployeeController {
-	
-	
-	
-	
 	
 	@Autowired
 	EmployeeService employeeService;
-
-	public EmployeeController() {
-		System.out.println("Employee controller called ");
-	}
-	
 	
 	//To get All employees
 	@GetMapping
-	List<Employee> getAllEmployees(){
-		
-		
-	return	employeeService.getApllEmployees();
-		
+	public List<Employee> getAllEmployees(){
+			
+	return	employeeService.getApllEmployees();	
 	}
-	
 	
 	// To create employee
 	@PostMapping()
-	ResponseEntity<String> createEmployee(@RequestBody Employee e)
+	public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequestDto e)
 	{
 		employeeService.saveUser(e);
 		
 		return ResponseEntity.ok("New Employee Created");
 	}
 	
-	
 	//Get employees by Id 
      @GetMapping("/{id}")
 	public Optional<Employee> getEmployeeById(@PathVariable int id)
 	{
 		return employeeService.getEmployeeById(id);
-		
-		
 	}
      
    //delete employee byId
@@ -68,15 +59,12 @@ public class EmployeeController {
      
      //Update employee
      @PutMapping("{id}")
-     String updateEmployee(@PathVariable int id, @RequestBody Employee e) {
+     public String updateEmployee(@PathVariable int id, @RequestBody Employee e) {
     	 
     	return employeeService.updateEmployee(id,e);
     	 
      }
-
-
-	
-	
+     
 	}
 	
 	
