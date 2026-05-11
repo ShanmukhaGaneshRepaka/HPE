@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class EmployeeRequestDto {
+public class CreateEmployeeRequestDto {
 
 	private int id;
 	
@@ -23,7 +23,8 @@ public class EmployeeRequestDto {
 	@Valid
 	@NotNull(message = "Employee details are required")
 	private EmployeeDetailsDto employeeDetails;
-
+    
+	@NotNull(message = "Role is required")
 	private Role role;
 
 }
