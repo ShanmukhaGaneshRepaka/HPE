@@ -2,10 +2,13 @@ package com.symphonize.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,18 +39,26 @@ public class EmployeeController {
 
 	// To create employee
 	@PostMapping("create-employee")
-	public ResponseEntity<ApiResponse<EmployeeResponseDto>> createEmployee(@Valid @RequestBody EmployeeRequestDto e) {
+	public ResponseEntity<ApiResponse<?>> createEmployee(@Valid @RequestBody EmployeeRequestDto e,
+			BindingResult bindingResult) {
+
+		// Validation handling
+		if (bindingResult.hasErrors()) {
+			List<String> errors = bindingResult.getFieldErrors().stream().map(error -> error.getDefaultMessage())
+					.collect(Collectors.toList());
+			ApiResponse<List<String>> response = new ApiResponse<>("FAILED", "Validation Failed",null, errors);
+			return ResponseEntity.badRequest().body(response);
+		}
 
 		try {
 
 			EmployeeResponseDto savedEmployee = employeeService.saveUser(e);
-			ApiResponse<EmployeeResponseDto> response = new ApiResponse<>(200, "Employee Created Successfully",
-					savedEmployee);
-
+			ApiResponse<EmployeeResponseDto> response = new ApiResponse<>("SUCCESS", "Employee Created Successfully",
+					savedEmployee,null);
 			return ResponseEntity.ok(response);
 
 		} catch (Exception ex) {
-			ApiResponse<EmployeeResponseDto> response = new ApiResponse<>(500, ex.getMessage(), null);
+			ApiResponse<String> response = new ApiResponse<>("FAILED", ex.getMessage(), null,List.of(ex.getMessage()));
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}

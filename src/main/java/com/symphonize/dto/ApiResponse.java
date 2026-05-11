@@ -1,5 +1,7 @@
 package com.symphonize.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ApiResponse<T> {
 
-    private int status;
+    private String status;
     private String message;
     private T data;
+    private List<String> errors;
 
 }

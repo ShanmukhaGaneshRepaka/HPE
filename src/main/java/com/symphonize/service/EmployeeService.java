@@ -28,15 +28,12 @@ public class EmployeeService {
 
 		EmployeeDetailsDto employeeDetails = dto.getEmployeeDetails();
 
-		//Conversion java Object to xml String
+		// Conversion java Object to xml String
 		String xml = convertToXml(employeeDetails);
 
 		Employee emp = new Employee();
-
 		emp.setName(dto.getName());
-
 		emp.setEmployeeDetails(xml);
-
 		emp.setRole(dto.getRole());
 
 		// Save in DB
@@ -44,16 +41,10 @@ public class EmployeeService {
 
 		// Prepare response DTO
 		EmployeeResponseDto response = new EmployeeResponseDto();
-
 		response.setId(savedEmployee.getId());
-
 		response.setName(savedEmployee.getName());
-
 		response.setRole(savedEmployee.getRole());
-
-		// Here we already have DTO object
 		response.setEmployeeDetails(employeeDetails);
-
 		return response;
 	}
 
@@ -84,15 +75,11 @@ public class EmployeeService {
 		try {
 
 			JAXBContext context = JAXBContext.newInstance(EmployeeDetailsDto.class);
-
 			Unmarshaller unmarshaller = context.createUnmarshaller();
-
 			StringReader reader = new StringReader(xml);
-
 			return (EmployeeDetailsDto) unmarshaller.unmarshal(reader);
 
 		} catch (Exception e) {
-
 			throw new RuntimeException(e);
 		}
 	}
