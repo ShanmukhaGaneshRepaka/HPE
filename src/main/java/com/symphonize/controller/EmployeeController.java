@@ -1,8 +1,11 @@
 package com.symphonize.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -29,13 +32,14 @@ public class EmployeeController {
 
 	@Autowired
 	EmployeeService employeeService;
-	
+
 	// To create employee
 	@PostMapping("create-employee")
 	public ResponseEntity<ApiResponse<?>> createEmployee(@Valid @RequestBody CreateEmployeeRequestDto e,
 			BindingResult bindingResult) {
 
-		// Validation handling @BindingResult triggers with @Valid then spring checks and collect all messages and converting them as list.
+		// Validation handling @BindingResult triggers with @Valid then spring checks
+		// and collect all messages and converting them as list.
 		if (bindingResult.hasErrors()) {
 			List<String> errors = bindingResult.getFieldErrors().stream().map(error -> error.getDefaultMessage())
 					.collect(Collectors.toList());
@@ -53,19 +57,25 @@ public class EmployeeController {
 
 	// Get employee by Id
 	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<?>> getEmployeeById(@PathVariable int id) {
+	public ResponseEntity<ApiResponse<?>> fetchEmployeeById(@PathVariable int id) {
+
 		EmployeeResponseDto employeedto = employeeService.getEmployeeById(id);
+		// To check whether employee is exists or not
+		if (employeedto == null) {
+			return ResponseWrapper.success("Employee not found", Collections.emptyList());
+		}
 		return ResponseWrapper.success("Employee Fetched Sucessfully", employeedto);
 	}
-	
+
 	// To get All employees
 	@GetMapping
-	public ResponseEntity<ApiResponse<?>> getAllEmployees() {	
-	List<EmployeeResponseDto> employees=	employeeService.getAllEmployees();
-		return ResponseWrapper.success("All employees Fetched sucessfully",employees);
+	public ResponseEntity<ApiResponse<?>> fetchAllEmployees() {
+		List<EmployeeResponseDto> employees = employeeService.getAllEmployees();
+		return ResponseWrapper.success("All employees Fetched sucessfully", employees);
 	}
-	
-    //For update employee used patch mapping because user may want to update partial data then no need to give full request.
+
+	// For update employee used patch mapping because user may want to update
+	// partial data then no need to give full request.
 	@PatchMapping("{id}")
 	public ResponseEntity<ApiResponse<?>> updateEmployee(@PathVariable int id,
 			@Valid @RequestBody UpdateEmployeeRequestDto e) {
@@ -77,7 +87,7 @@ public class EmployeeController {
 
 	// deletes employee byId
 	@DeleteMapping("{id}")
-	public void deleteEmployee(@PathVariable int id) {
-	 employeeService.deleteEmployee(id);
+	public ResponseEntity<ApiResponse<?>> deleteEmployee(@PathVariable int id) {
+		return ResponseWrapper.success("Employee deleted successfully", null);
 	}
 }

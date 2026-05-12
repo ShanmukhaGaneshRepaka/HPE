@@ -83,8 +83,9 @@ public class EmployeeService {
 	public void deleteEmployee(int id) {
 		// checking employee exists or not
 
-		Employee employee = employeeRepository.findById(id)
-				.orElseThrow();
+		 Employee employee = employeeRepository.findById(id)
+		            .orElseThrow(() ->
+		                    new RuntimeException("Employee deletion failed"));
 
 		employeeRepository.delete(employee);
 	}	
