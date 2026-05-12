@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ApiResponse<T> {
 
     private String status;
+    private int statusCode;
     private String message;
     private T data;
     private List<String> errors;

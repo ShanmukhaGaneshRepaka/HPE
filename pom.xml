@@ -12,12 +12,10 @@
 	<artifactId>EmployeeManagementSystem</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>EmployeeManagementSystem</name>
-
 	<properties>
 		<java.version>11</java.version>
 	</properties>
 	<dependencies>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -50,7 +48,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.7.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -60,5 +62,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

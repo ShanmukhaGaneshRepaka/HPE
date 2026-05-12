@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,69 +26,104 @@ import com.symphonize.dto.UpdateEmployeeRequestDto;
 import com.symphonize.dto.UpdateEmployeeResponseDto;
 import com.symphonize.service.EmployeeService;
 import com.symphonize.utils.ResponseWrapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("api/employee")
+@Tag(name = "Employee APIs", description = "Operations related to employees")
 public class EmployeeController {
 
 	@Autowired
 	EmployeeService employeeService;
 
 	// To create employee
-	@PostMapping("create-employee")
+	@PostMapping()
+	@Operation(summary = "Create new employee", description = "Returns employee details with proper response structure")
 	public ResponseEntity<ApiResponse<?>> createEmployee(@Valid @RequestBody CreateEmployeeRequestDto e,
 			BindingResult bindingResult) {
-
-		// Validation handling @BindingResult triggers with @Valid then spring checks
-		// and collect all messages and converting them as list.
+		/*
+		 * Validation handling @BindingResult triggers with @Valid then spring checks
+		 * and collect all messages and converting them as list.
+		 */
 		if (bindingResult.hasErrors()) {
 			List<String> errors = bindingResult.getFieldErrors().stream().map(error -> error.getDefaultMessage())
 					.collect(Collectors.toList());
-			return ResponseWrapper.requestValidator("Validation Failed", errors);
+			return ResponseWrapper.requestValidator("Validation Failed", HttpStatus.BAD_REQUEST.value(), errors);
 		}
 
 		try {
 			EmployeeResponseDto savedEmployee = employeeService.createEmployee(e);
-			return ResponseWrapper.success("Employee Created Sucessfully", savedEmployee);
+			return ResponseWrapper.success("Employee Created Sucessfully", HttpStatus.CREATED.value(), savedEmployee);
 
 		} catch (Exception ex) {
-			return ResponseWrapper.error("Failed to create Employee ", List.of(ex.getMessage()));
+			return ResponseWrapper.error(ex.getMessage(), HttpStatus.CREATED.value(), List.of(ex.getMessage()));
 		}
 	}
 
 	// Get employee by Id
 	@GetMapping("/{id}")
+	@Operation(summary = "Fetch employee by id", description = "Returns employee details based on employee id")
 	public ResponseEntity<ApiResponse<?>> fetchEmployeeById(@PathVariable int id) {
 
-		EmployeeResponseDto employeedto = employeeService.getEmployeeById(id);
-		// To check whether employee is exists or not
-		if (employeedto == null) {
-			return ResponseWrapper.success("Employee not found", Collections.emptyList());
+		try {
+			EmployeeResponseDto employeedto = employeeService.getEmployeeById(id);
+			return ResponseWrapper.success("Employee Fetched Sucessfully", HttpStatus.OK.value(), employeedto);
+
+		} catch (RuntimeException ex) {
+
+			return ResponseWrapper.error(ex.getMessage(), HttpStatus.NOT_FOUND.value(), Collections.emptyList());
+
+		} catch (Exception ex) {
+
+			return ResponseWrapper.error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+					Collections.emptyList());
 		}
-		return ResponseWrapper.success("Employee Fetched Sucessfully", employeedto);
 	}
 
 	// To get All employees
 	@GetMapping
+	@Operation(summary = "To Fetch All employees", description = "Returns all employees from database")
 	public ResponseEntity<ApiResponse<?>> fetchAllEmployees() {
-		List<EmployeeResponseDto> employees = employeeService.getAllEmployees();
-		return ResponseWrapper.success("All employees Fetched sucessfully", employees);
+
+		try {
+			List<EmployeeResponseDto> employees = employeeService.getAllEmployees();
+			return ResponseWrapper.success("All employees Fetched sucessfully", HttpStatus.OK.value(), employees);
+		} catch (RuntimeException ex) {
+			return ResponseWrapper.success(ex.getMessage(), HttpStatus.OK.value(), Collections.EMPTY_LIST);
+
+		} catch (Exception ex) {
+
+			return ResponseWrapper.error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+					Collections.emptyList());
+
+		}
 	}
 
 	// For update employee used patch mapping because user may want to update
 	// partial data then no need to give full request.
 	@PatchMapping("{id}")
+	@Operation(summary = "Update employee  by id", description = "Returns employee updated details with proper response structure and data")
 	public ResponseEntity<ApiResponse<?>> updateEmployee(@PathVariable int id,
 			@Valid @RequestBody UpdateEmployeeRequestDto e) {
 
 		UpdateEmployeeResponseDto updated = employeeService.updateEmployee(id, e);
 
-		return ResponseWrapper.success("Employee updated successfully", updated);
+		return ResponseWrapper.success("Employee updated successfully", HttpStatus.OK.value(), updated);
 	}
 
 	// deletes employee byId
 	@DeleteMapping("{id}")
+	@Operation(summary = "Delete employee by id", description = "It deletes employee by Id and returns emloyee deleted sucessfully with proper response structure")
 	public ResponseEntity<ApiResponse<?>> deleteEmployee(@PathVariable int id) {
-		return ResponseWrapper.success("Employee deleted successfully", null);
+
+		try {
+			employeeService.deleteEmployee(id);
+			return ResponseWrapper.success("Employee deleted successfully", HttpStatus.OK.value(), null);
+
+		} catch (Exception e) {
+			return ResponseWrapper.error(e.getMessage(), HttpStatus.OK.value(), null);
+
+		}
 	}
 }

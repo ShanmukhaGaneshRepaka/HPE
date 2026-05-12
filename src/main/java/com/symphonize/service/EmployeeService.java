@@ -32,12 +32,17 @@ public class EmployeeService {
 		emp.setName(dto.getName());
 		emp.setEmployeeDetails(xml);
 		emp.setRole(dto.getRole());
-
-		// Save in DB
-		Employee savedEmployee = employeeRepository.save(emp);
+		Employee savedEmployee;
+		try {
+			// Save employee in DB
+			savedEmployee = employeeRepository.save(emp);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to save the employee in database");
+		}
 
 		// Prepare response DTO
 		EmployeeResponseDto response = new EmployeeResponseDto();
+		response.setId(savedEmployee.getId());
 		response.setName(savedEmployee.getName());
 		response.setRole(savedEmployee.getRole());
 		response.setEmployeeDetails(employeeDetails);
@@ -51,6 +56,7 @@ public class EmployeeService {
 				.orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
 
 		EmployeeResponseDto empResponse = new EmployeeResponseDto();
+		empResponse.setId(emp.getId());
 		empResponse.setName(emp.getName());
 		empResponse.setRole(emp.getRole());
 
@@ -64,8 +70,12 @@ public class EmployeeService {
 	// To get all employees
 	public List<EmployeeResponseDto> getAllEmployees() {
 		List<Employee> allEmployees = employeeRepository.findAll();
+
+		if (allEmployees.isEmpty()) {
+			throw new RuntimeException("No employees found in the database");
+		}
 		List<EmployeeResponseDto> responseList = new ArrayList<>();
-		
+
 		for (Employee emp : allEmployees) {
 			EmployeeResponseDto dto = new EmployeeResponseDto();
 			dto.setId(emp.getId());
@@ -78,17 +88,6 @@ public class EmployeeService {
 		}
 		return responseList;
 	}
-
-	// To delete an employee
-	public void deleteEmployee(int id) {
-		// checking employee exists or not
-
-		 Employee employee = employeeRepository.findById(id)
-		            .orElseThrow(() ->
-		                    new RuntimeException("Employee deletion failed"));
-
-		employeeRepository.delete(employee);
-	}	
 
 	// To update an employee
 	public UpdateEmployeeResponseDto updateEmployee(int id, UpdateEmployeeRequestDto emp) {
@@ -120,13 +119,30 @@ public class EmployeeService {
 		// Convert Object → XML again
 		String updatedXml = XmlUtil.convertToXml(existingDetails);
 		old.setEmployeeDetails(updatedXml);
-		Employee saved = employeeRepository.save(old);
+		Employee saved;
+		try {
+			saved = employeeRepository.save(old);
+
+		} catch (Exception e) {
+			throw new RuntimeException("Update employee failed");
+		}
+
 		// Convert Entity → DTO
 		UpdateEmployeeResponseDto response = new UpdateEmployeeResponseDto();
 		response.setName(saved.getName());
 		response.setRole(saved.getRole());
 		response.setEmployeeDetails(existingDetails);
 		return response;
+	}
+
+	// To delete an employee
+	public void deleteEmployee(int id) {
+		// checking employee exists or not
+
+		Employee employee = employeeRepository.findById(id).orElseThrow(
+				() -> new RuntimeException("Employee deletion failed because no employee found with this id " + id));
+
+		employeeRepository.delete(employee);
 	}
 
 }
