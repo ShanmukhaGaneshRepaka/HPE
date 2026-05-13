@@ -23,6 +23,10 @@ public class EmployeeService {
 
 	public EmployeeResponseDto createEmployee(CreateEmployeeRequestDto dto) {
 
+		if (employeeRepository.existsByEmail(dto.getEmail())) {
+			throw new RuntimeException("Employee already exists in the Database");
+		}
+
 		EmployeeDetailsDto employeeDetails = dto.getEmployeeDetails();
 
 		// Conversion java Object to xml String
@@ -30,10 +34,12 @@ public class EmployeeService {
 
 		Employee emp = new Employee();
 		emp.setName(dto.getName());
+		emp.setEmail(dto.getEmail());
 		emp.setEmployeeDetails(xml);
 		emp.setRole(dto.getRole());
 		Employee savedEmployee;
 		try {
+
 			// Save employee in DB
 			savedEmployee = employeeRepository.save(emp);
 		} catch (Exception e) {
@@ -44,6 +50,7 @@ public class EmployeeService {
 		EmployeeResponseDto response = new EmployeeResponseDto();
 		response.setId(savedEmployee.getId());
 		response.setName(savedEmployee.getName());
+		response.setEmail(savedEmployee.getEmail());
 		response.setRole(savedEmployee.getRole());
 		response.setEmployeeDetails(employeeDetails);
 		return response;
@@ -59,6 +66,7 @@ public class EmployeeService {
 		empResponse.setId(emp.getId());
 		empResponse.setName(emp.getName());
 		empResponse.setRole(emp.getRole());
+		empResponse.setEmail(emp.getEmail());
 
 		// Convert xml to java Object for Employee Details
 		EmployeeDetailsDto employeeDetails = XmlUtil.convertXmlToObject(emp.getEmployeeDetails());
@@ -80,6 +88,7 @@ public class EmployeeService {
 			EmployeeResponseDto dto = new EmployeeResponseDto();
 			dto.setId(emp.getId());
 			dto.setName(emp.getName());
+			dto.setEmail(emp.getEmail());
 			dto.setRole(emp.getRole());
 			// XML → Object conversion
 			EmployeeDetailsDto details = XmlUtil.convertXmlToObject(emp.getEmployeeDetails());
@@ -137,12 +146,15 @@ public class EmployeeService {
 
 	// To delete an employee
 	public void deleteEmployee(int id) {
-		// checking employee exists or not
 
+		// checking employee exists or not
 		Employee employee = employeeRepository.findById(id).orElseThrow(
 				() -> new RuntimeException("Employee deletion failed because no employee found with this id " + id));
-
-		employeeRepository.delete(employee);
+		try {
+			employeeRepository.delete(employee);
+		} catch (Exception e) {
+			throw new RuntimeException("Employee deletion failed, Something went wrong");
+		}
 	}
 
 }

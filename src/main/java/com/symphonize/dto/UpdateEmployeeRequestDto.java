@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 public class UpdateEmployeeRequestDto {
 	@NotNull(message="id is required to delete user")
 	private int id;
-	private String name;	
+	private String name;
+	private String email;
 	private EmployeeDetailsDto employeeDetails;
 	private Role role;
 

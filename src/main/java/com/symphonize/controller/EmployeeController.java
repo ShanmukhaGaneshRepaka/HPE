@@ -1,6 +1,5 @@
 package com.symphonize.controller;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +56,7 @@ public class EmployeeController {
 			return ResponseWrapper.success("Employee Created Sucessfully", HttpStatus.CREATED.value(), savedEmployee);
 
 		} catch (Exception ex) {
-			return ResponseWrapper.error(ex.getMessage(), HttpStatus.CREATED.value(), List.of(ex.getMessage()));
+			return ResponseWrapper.error(ex.getMessage(), HttpStatus.OK.value(), List.of(ex.getMessage()));
 		}
 	}
 
@@ -66,18 +65,21 @@ public class EmployeeController {
 	@Operation(summary = "Fetch employee by id", description = "Returns employee details based on employee id")
 	public ResponseEntity<ApiResponse<?>> fetchEmployeeById(@PathVariable int id) {
 
+		if (id <= 0) {
+			return ResponseWrapper.error("Inavlid id", HttpStatus.BAD_REQUEST.value(), null);
+		}
+
 		try {
 			EmployeeResponseDto employeedto = employeeService.getEmployeeById(id);
 			return ResponseWrapper.success("Employee Fetched Sucessfully", HttpStatus.OK.value(), employeedto);
 
 		} catch (RuntimeException ex) {
 
-			return ResponseWrapper.error(ex.getMessage(), HttpStatus.NOT_FOUND.value(), Collections.emptyList());
+			return ResponseWrapper.error(ex.getMessage(), HttpStatus.NOT_FOUND.value(), null);
 
 		} catch (Exception ex) {
 
-			return ResponseWrapper.error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-					Collections.emptyList());
+			return ResponseWrapper.error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
 		}
 	}
 
@@ -90,13 +92,9 @@ public class EmployeeController {
 			List<EmployeeResponseDto> employees = employeeService.getAllEmployees();
 			return ResponseWrapper.success("All employees Fetched sucessfully", HttpStatus.OK.value(), employees);
 		} catch (RuntimeException ex) {
-			return ResponseWrapper.success(ex.getMessage(), HttpStatus.OK.value(), Collections.EMPTY_LIST);
-
+			return ResponseWrapper.success(ex.getMessage(), HttpStatus.OK.value(), null);
 		} catch (Exception ex) {
-
-			return ResponseWrapper.error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-					Collections.emptyList());
-
+			return ResponseWrapper.error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR.value(), null);
 		}
 	}
 
@@ -107,15 +105,26 @@ public class EmployeeController {
 	public ResponseEntity<ApiResponse<?>> updateEmployee(@PathVariable int id,
 			@Valid @RequestBody UpdateEmployeeRequestDto e) {
 
-		UpdateEmployeeResponseDto updated = employeeService.updateEmployee(id, e);
+		if (id <= 0) {
+			return ResponseWrapper.error("Invalid id", HttpStatus.BAD_REQUEST.value(), null);
+		}
+		try {
+			UpdateEmployeeResponseDto updated = employeeService.updateEmployee(id, e);
+			return ResponseWrapper.success("Employee updated successfully", HttpStatus.OK.value(), updated);
+		} catch (Exception e1) {
+			return ResponseWrapper.error(e1.getMessage(), HttpStatus.OK.value(), null);
+		}
 
-		return ResponseWrapper.success("Employee updated successfully", HttpStatus.OK.value(), updated);
 	}
 
 	// deletes employee byId
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete employee by id", description = "It deletes employee by Id and returns emloyee deleted sucessfully with proper response structure")
 	public ResponseEntity<ApiResponse<?>> deleteEmployee(@PathVariable int id) {
+
+		if (id <= 0) {
+			return ResponseWrapper.error("Invalid id", HttpStatus.BAD_REQUEST.value(), null);
+		}
 
 		try {
 			employeeService.deleteEmployee(id);

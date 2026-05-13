@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class UpdateEmployeeResponseDto {
-
 	private String name;	
+	private String email;
 	private EmployeeDetailsDto employeeDetails;
 	private Role role;
 }

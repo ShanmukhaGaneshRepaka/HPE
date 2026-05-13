@@ -1,6 +1,8 @@
 package com.symphonize.dto;
 
+import javax.persistence.Column;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -16,14 +18,18 @@ import lombok.NoArgsConstructor;
 public class CreateEmployeeRequestDto {
 
 	private int id;
-	
+
 	@NotBlank(message = "Name is required")
 	private String name;
 	
+	@Email(message = "Invalid email format")
+	@NotBlank(message = "Email is required")
+	private String email;
+
 	@Valid
 	@NotNull(message = "Employee details are required")
 	private EmployeeDetailsDto employeeDetails;
-    
+
 	@NotNull(message = "Role is required")
 	private Role role;
 

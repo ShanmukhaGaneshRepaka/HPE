@@ -8,9 +8,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@XmlRootElement
+
 @Data
 @NoArgsConstructor
+@XmlRootElement(name = "employeeDetails")
 public class EmployeeDetailsDto {
 	
 	@Min(value = 1, message = "Salary must be greater than 0")
