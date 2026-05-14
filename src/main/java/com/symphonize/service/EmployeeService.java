@@ -157,4 +157,25 @@ public class EmployeeService {
 		}
 	}
 
+	// To get all employees department
+	public List<EmployeeResponseDto> getEmployeesByDepartment(String dept) {
+
+		List<Employee> empsByDept = employeeRepository.getEmployeesByDepartment(dept);
+
+		List<EmployeeResponseDto> responseList = new ArrayList<>();
+		for (Employee emp : empsByDept) {
+			EmployeeResponseDto dto = new EmployeeResponseDto();
+			dto.setId(emp.getId());
+			dto.setName(emp.getName());
+			dto.setEmail(emp.getEmail());
+			dto.setRole(emp.getRole());
+			// XML → Object conversion
+			EmployeeDetailsDto details = XmlUtil.convertXmlToObject(emp.getEmployeeDetails());
+			dto.setEmployeeDetails(details);
+			responseList.add(dto);
+		}
+
+		return responseList;
+	}
+
 }

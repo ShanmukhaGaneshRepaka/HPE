@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,12 +26,14 @@ import com.symphonize.dto.UpdateEmployeeRequestDto;
 import com.symphonize.dto.UpdateEmployeeResponseDto;
 import com.symphonize.service.EmployeeService;
 import com.symphonize.utils.ResponseWrapper;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("api/employee")
 @Tag(name = "Employee APIs", description = "Operations related to employees")
+//@Validated// To tell the spring  exceptions handlers are there
 public class EmployeeController {
 
 	@Autowired
@@ -134,5 +137,15 @@ public class EmployeeController {
 			return ResponseWrapper.error(e.getMessage(), HttpStatus.OK.value(), null);
 
 		}
+	}
+	
+	//get Employees By department
+	@GetMapping("get-empls-by-dept/{dept}")
+	public ResponseEntity<ApiResponse<?>> getEmployeesByDepartment(@PathVariable String dept){
+		
+	List<EmployeeResponseDto>response = 	employeeService.getEmployeesByDepartment(dept);
+		
+		return ResponseWrapper.success("Employees Fetches sucessfully", HttpStatus.OK.value(),response);
+		
 	}
 }
